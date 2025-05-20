@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 
 import com.yanisdiss.javarras.utils;
 import com.yanisdiss.javarras.colors;
+import com.yanisdiss.javarras.gameConfig;
 
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -16,7 +17,6 @@ public class javarras extends ApplicationAdapter {
 
     @Override
     public void create() {
-        Gdx.graphics.setWindowedMode(1280, 720);
         shapeRenderer = new ShapeRenderer();
 
     }
@@ -29,7 +29,6 @@ public class javarras extends ApplicationAdapter {
         float x = utils.getWindowDimensions()[0] / 2f;
         float y = utils.getWindowDimensions()[1] / 2f;
         float radius = 20;
-        float stroke_width = 3f;
 
         Color myColor = colors.red;
         Color darker = utils.darker(myColor);
@@ -37,7 +36,7 @@ public class javarras extends ApplicationAdapter {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled); // or ShapeType.Line for outline
         shapeRenderer.setColor(darker);
 
-        shapeRenderer.circle(x, y, radius + stroke_width,100);
+        shapeRenderer.circle(x, y, radius + gameConfig.STROKE_WIDTH,100);
 
         shapeRenderer.setColor(myColor);
         shapeRenderer.circle(x, y, radius,100);
