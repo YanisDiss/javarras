@@ -3,7 +3,7 @@ package com.yanisdiss.javarras;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.Gdx;
 
-public final class gameUtils {
+public final class GameUtils {
     public static Color darker(Color color) {
         return new Color(color.r / 2f, color.g / 2f, color.b / 2f, color.a);
     }
@@ -25,7 +25,7 @@ public final class gameUtils {
     }
 
     public static float topY(float y) {
-        return gameConfig.WINDOW_HEIGHT - y;
+        return GameConfig.WINDOW_HEIGHT - y;
     }
 
 }

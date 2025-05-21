@@ -2,8 +2,8 @@ package com.yanisdiss.javarras.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.yanisdiss.javarras.javarras;
-import com.yanisdiss.javarras.gameConfig;
+import com.yanisdiss.javarras.Javarras;
+import com.yanisdiss.javarras.GameConfig;
 
 /** Launches the desktop (LWJGL3) application. */
 public class javarrasDesktopLauncher {
@@ -13,12 +13,12 @@ public class javarrasDesktopLauncher {
     }
 
     private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new javarras(), getDefaultConfiguration());
+        return new Lwjgl3Application(new Javarras(), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
-        configuration.setTitle("javarras");
+        configuration.setTitle("Javarras");
         //// Vsync limits the frames per second to what your hardware can display, and helps eliminate
         //// screen tearing. This setting doesn't always work on Linux, so the line after is a safeguard.
         configuration.useVsync(true);
@@ -29,8 +29,16 @@ public class javarrasDesktopLauncher {
         //// useful for testing performance, but can also be very stressful to some hardware.
         //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
 
-        configuration.setWindowedMode(gameConfig.WINDOW_WIDTH, gameConfig.WINDOW_HEIGHT);
-        configuration.setResizable(gameConfig.RESIZABLE_WINDOW);
+        configuration.setBackBufferConfig(
+            8, 8, 8, 8,   // RGBA bits
+            16,           // depth buffer
+            8,            // stencil buffer
+            GameConfig.LOW_GRAPHICS ? 1 : 8            // **MSAA samples (4x AA)**
+        );
+        //configuration.useVsync(true);
+
+        configuration.setWindowedMode(GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT);
+        configuration.setResizable(GameConfig.RESIZABLE_WINDOW);
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         //// They can also be loaded from the root of assets/ .
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");

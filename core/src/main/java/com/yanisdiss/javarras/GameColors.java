@@ -2,8 +2,9 @@ package com.yanisdiss.javarras;
 
 import com.badlogic.gdx.graphics.Color;
 
-public final class gameColors {
+public final class GameColors {
     public static final Color bg = new Color (0xccccccff);
+    public static final Color grid = new Color (0xbbbbbbff);
     public static final Color grey = new Color(0x7f7f7fff);
     public static final Color blue = new Color(0x00bbffff);
     public static final Color red = new Color(0xff3030ff);
@@ -12,5 +13,8 @@ public final class gameColors {
     public static final Color gold = new Color(0xffe600ff);
     public static final Color yellow = new Color(0xfff069ff);
     public static final Color orange = new Color(0xff684aff);
+    public static final Color guiblack = new Color(0x000000ff);
+    public static final Color black = new Color(0x333333ff);
+    public static final Color white = new Color(0xffffffff);
 
 }
