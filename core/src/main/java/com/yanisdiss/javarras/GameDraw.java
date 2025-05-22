@@ -97,6 +97,54 @@ public final class GameDraw {
         }
     }
 
+    public static void drawHealth(GameEntity entity, ShapeRenderer shapeRenderer) {
+        float outer = 2;
+        float barHeight =3;
+        float offsetY = entity.getSize() + barHeight + 8;
+        float barWidth = entity.getSize() * 2 - outer*2 ;
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(GameColors.black);
+
+        // round outline edges
+        shapeRenderer.circle(
+            entity.getX() - barWidth/2,
+            GameUtils.topY( entity.getY() + offsetY + outer/2 - (barHeight+outer) / 2),
+            (barHeight + outer*2)/2, circleSegs);
+        shapeRenderer.circle(
+            entity.getX() + barWidth/2,
+            GameUtils.topY( entity.getY() + offsetY + outer/2 - (barHeight+outer) / 2),
+            (barHeight + outer*2)/2, circleSegs);
+
+        // the black bar outline
+        shapeRenderer.rect(
+            entity.getX() - barWidth / 2,
+            GameUtils.topY( entity.getY() + offsetY + outer),
+            barWidth,
+            barHeight + outer * 2
+        );
+
+        shapeRenderer.setColor(GameColors.green);
+        // the bar itself
+        shapeRenderer.rect(
+            entity.getX() - barWidth / 2,
+            GameUtils.topY(entity.getY() + offsetY),
+            barWidth * entity.getHealth() / entity.getMaxHealth(),
+            barHeight
+        );
+        // round edges 2
+        shapeRenderer.circle(
+            entity.getX() - barWidth/2,
+            GameUtils.topY( entity.getY() + offsetY + outer/2 - (barHeight+outer) / 2),
+            (barHeight)/2, circleSegs);
+        shapeRenderer.circle(
+            entity.getX() + barWidth * (entity.getHealth() / entity.getMaxHealth()) - barWidth/2,
+            GameUtils.topY(entity.getY() + offsetY + outer/2 - (barHeight+outer) / 2),
+            (barHeight)/2, circleSegs);
+
+        shapeRenderer.end();
+    }
+
     public static void drawGrid(float gridSize , ShapeRenderer shapeRenderer) {
         float x = 0;
         float y = 0;

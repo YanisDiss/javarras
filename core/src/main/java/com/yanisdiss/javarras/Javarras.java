@@ -1,6 +1,7 @@
 package com.yanisdiss.javarras;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
@@ -42,14 +43,28 @@ public class Javarras extends ApplicationAdapter {
 
     @Override
     public void render() {
-
+        float delta = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(GameColors.bg);
         GameDraw.drawGrid(20,shapeRenderer);
-        for (GameEntity entity : GameGlobals.entities) {
-            GameDraw.drawEntity(entity, shapeRenderer);
-            entity.step();
-        }
+if (GameGlobals.entities != null && !GameGlobals.entities.isEmpty())
+        {
+            // draw entities
+            for (GameEntity entity : GameGlobals.entities) {
+                if (entity.isAlive()) {
+                    GameDraw.drawEntity(entity, shapeRenderer);
+                }
 
+                entity.step(delta);
+            }
+            // draw hp bars above all entities
+            for (GameEntity entity : GameGlobals.entities) {
+                if (entity.isAlive()) {
+                    GameDraw.drawHealth(entity, shapeRenderer);
+                }
+
+                entity.step(delta);
+            }
+        }
     }
 
     @Override
