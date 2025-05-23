@@ -84,6 +84,7 @@ public class GameEntity {
         } else
         {
             // todo: add death anim
+            GameGlobals.entities.remove(this);
         }
 
     }
@@ -111,7 +112,6 @@ public class GameEntity {
     public void kill() {
         this.health = 0;
         this.isAlive = false;
-        //GameGlobals.entities.remove(this); todo: fix game crashes
     }
 
     public void changeHealth(float hlt) {

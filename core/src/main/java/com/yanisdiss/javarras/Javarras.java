@@ -1,11 +1,16 @@
 package com.yanisdiss.javarras;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
+ * platforms.
+ */
 public class Javarras extends ApplicationAdapter {
     ShapeRenderer shapeRenderer;
     GameEntity player;
@@ -22,21 +27,21 @@ public class Javarras extends ApplicationAdapter {
         Gun basicGun = new Gun(null, 18, 8, 1, 0, 0, 90);
 
         Gun[] boosterGuns = {
-            new Gun(null, 18, 8, 1, 0, 0, 0),
-            new Gun(null, 14, 8, 1, 0, -1, 140),
-            new Gun(null, 14, 8, 1, 0, 1, -140),
-            new Gun(null, 16, 8, 1, 0, 0, 150),
-            new Gun(null, 16, 8, 1, 0, 0, -150)
+                new Gun(null, 18, 8, 1, 0, 0, 0),
+                new Gun(null, 14, 8, 1, 0, -1, 140),
+                new Gun(null, 14, 8, 1, 0, 1, -140),
+                new Gun(null, 16, 8, 1, 0, 0, 150),
+                new Gun(null, 16, 8, 1, 0, 0, -150)
         };
 
-        player = new GameEntity(GameColors.blue,x,y,size,health);
+        player = new GameEntity(GameColors.blue, x, y, size, health);
 
         for (int i = 0; i < 5; i++) {
             player.addGun(boosterGuns[i]);
         }
 
         GameGlobals.entities.add(player);
-        GameEntity testEntity = new GameEntity(GameColors.pink,x+200,y+200,size,health);
+        GameEntity testEntity = new GameEntity(GameColors.pink, x + 200, y + 200, size, health);
         GameGlobals.entities.add(testEntity);
 
     }
@@ -44,12 +49,12 @@ public class Javarras extends ApplicationAdapter {
     @Override
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
+
         ScreenUtils.clear(GameColors.bg);
-        GameDraw.drawGrid(20,shapeRenderer);
-if (GameGlobals.entities != null && !GameGlobals.entities.isEmpty())
-        {
+        GameDraw.drawGrid(20, shapeRenderer);
+        if (GameGlobals.entities != null && !GameGlobals.entities.isEmpty()) {
             // draw entities
-            for (GameEntity entity : GameGlobals.entities) {
+            for (GameEntity entity : new ArrayList<>(GameGlobals.entities)) {
                 if (entity.isAlive()) {
                     GameDraw.drawEntity(entity, shapeRenderer);
                 }
@@ -57,7 +62,7 @@ if (GameGlobals.entities != null && !GameGlobals.entities.isEmpty())
                 entity.step(delta);
             }
             // draw hp bars above all entities
-            for (GameEntity entity : GameGlobals.entities) {
+            for (GameEntity entity : new ArrayList<>(GameGlobals.entities)) {
                 if (entity.isAlive()) {
                     GameDraw.drawHealth(entity, shapeRenderer);
                 }
@@ -69,7 +74,7 @@ if (GameGlobals.entities != null && !GameGlobals.entities.isEmpty())
 
     @Override
     public void resize(int width, int height) {
-       // hi
+        // hi
     }
 
     @Override
