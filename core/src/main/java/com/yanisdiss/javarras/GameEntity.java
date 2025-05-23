@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class GameEntity {
@@ -24,10 +23,15 @@ public class GameEntity {
     private boolean isAlive;
     private boolean canRender;
     private boolean canCollide;
+    private int team;
+    private float bodyDamage;
+    private float density;
+    private GameEntity master;
     private final int id;
     private List<Gun> guns = new ArrayList<>();
+    private boolean injured;
 
-    public GameEntity(Color color, float x, float y, float size, float health) {
+    public GameEntity(Color color, float x, float y, float size, float health, int team) {
         this.color = (color != null) ? color : GameColors.grey;
         this.x = x;
         this.y = y;
@@ -37,7 +41,13 @@ public class GameEntity {
         this.isAlive = true;
         this.canRender = true;
         this.canCollide = true;
+        this.team = team;
+        this.master = this;
         this.id = entityId;
+        this.bodyDamage = 0.1f;
+        this.density = 1;
+        this.injured = false;
+
         incrementId();
     }
 
@@ -58,6 +68,16 @@ public class GameEntity {
         }
     }
 
+    public void collide(GameEntity other) {
+        float selfAngle = (float)Math.atan2(this.y - other.y, this.x - other.x);
+        this.vx += (float) (Math.cos(selfAngle) * this.density);
+        this.vy += (float) (Math.sin(selfAngle) * this.density);
+
+        float otherAngle = (float)Math.atan2(other.y - this.y, other.x - this.x);
+        other.vx += Math.cos(otherAngle) * other.density;
+        other.vy += Math.sin(otherAngle) * other.density;
+    }
+
     public void step(float delta) {
 
         if (this.isAlive){
@@ -73,17 +93,34 @@ public class GameEntity {
             this.vx += this.ax * delta;
             this.vy += this.ay * delta;
 
-            this.vx *= 0.95f;
-            this.vy *= 0.95f;
+            this.vx *= 0.9f;
+            this.vy *= 0.9f;
 
             this.x += this.vx * delta;
             this.y += this.vy * delta;
 
-            // todo: add collision below this
+            for (GameEntity other : new ArrayList<>(GameGlobals.entities)) {
+                if (this.id != other.id && other.isAlive) {
+                    float dist = (float)Math.hypot(this.x - other.x, this.y - other.y);
+                    if (dist <= this.size + other.size) {
+                        if (this.canCollide && other.canCollide) {
+                           this.collide(other);
+                        }
+                        if (this.team != other.team) {
+                        this.changeHealth(-other.bodyDamage);
+                        other.changeHealth(-this.bodyDamage);
+                    }
+                    }
+                }
+            }
+
+            if (this.injured) {
+                this.injured = false;
+            }
 
         } else
         {
-            // todo: add death anim
+            // todo: death animation will be client-sided (gameDrawer) do not add it here
             GameGlobals.entities.remove(this);
         }
 
@@ -117,6 +154,9 @@ public class GameEntity {
     public void changeHealth(float hlt) {
         this.health = Math.min(this.health + hlt , this.maxHealth);
         if (this.health <= 0) this.kill();
+        if (hlt < 0) {
+            this.injured = true;
+        }
     }
 
     public void setMaxHealth(float maxHealth) {
@@ -209,5 +249,25 @@ public class GameEntity {
 
     public void addGun(Gun gun) {
         this.guns.add(gun);
+    }
+
+    public boolean isInjured() {
+        return injured;
+    }
+
+    public int getTeam() {
+        return team;
+    }
+
+    public void setTeam(int team) {
+        this.team = team;
+    }
+
+    public GameEntity getMaster() {
+        return master;
+    }
+
+    public void setMaster(GameEntity master) {
+        this.master = master;
     }
 }

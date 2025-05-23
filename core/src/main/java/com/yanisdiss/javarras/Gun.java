@@ -5,9 +5,11 @@ import com.badlogic.gdx.graphics.Color;
 public class Gun {
     private float length, width, aspect,x,y,angle;
     private Color color;
+    private GameEntity master;
 
-    public Gun(Color color, float length, float width, float aspect, float x, float y, float angle)
+    public Gun(GameEntity master, Color color, float length, float width, float aspect, float x, float y, float angle)
     {
+        this.master = master;
         this.color = (color != null) ? color : GameColors.grey;
         this.length = length;
         this.width = width;

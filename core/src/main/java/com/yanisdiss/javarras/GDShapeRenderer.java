@@ -3,10 +3,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.Color;
 
-public final class GameDraw {
+public final class GDShapeRenderer implements GameDrawer {
     private static final int circleSegs = 100;
 
-    public static void drawGuns(GameEntity entity, ShapeRenderer shapeRenderer) {
+    public void drawGuns(GameEntity entity, ShapeRenderer shapeRenderer) {
         for (Gun gun : entity.getGuns()) {
 
             float gunWidth = gun.getWidth() * entity.getSize()/20;
@@ -14,7 +14,10 @@ public final class GameDraw {
             float gunAngle = gun.getAngle();
             float gunX = gun.getX();
             float gunY = gun.getY();
-            Color gunColor = gun.getColor();
+            Color lighter = GameUtils.brightnessShift(gun.getColor(), 100);
+            Color gunColor = (entity.isInjured()) ? lighter : gun.getColor();
+            Color darker = GameUtils.darker(gunColor);
+
             float gunAspect = (gun.getAspect() < -1) ? Math.abs(gun.getAspect()) : (-1 < gun.getAspect() && gun.getAspect() <= 0) ? Math.abs(gun.getAspect()) : 1;
             float gunAspect2 = (gun.getAspect() > 1) ? Math.abs(gun.getAspect()) : (0 < gun.getAspect() && gun.getAspect() <= 1) ? gun.getAspect() : 1;
 
@@ -47,11 +50,11 @@ public final class GameDraw {
             // the gun main stroke
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             Gdx.gl20.glLineWidth(GameConfig.STROKE_WIDTH * 2);
-            shapeRenderer.setColor(GameUtils.darker(gun.getColor()));
+            shapeRenderer.setColor(darker);
             shapeRenderer.polygon(vertices);
             shapeRenderer.end();
 
-            // to fill the stroke gaps
+            // to fill the outline gaps
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             for (int i = 0; i < 4; i++) {
                 shapeRenderer.circle(vertices[0+2*i], vertices[1+2*i], GameConfig.STROKE_WIDTH, circleSegs);
@@ -72,14 +75,15 @@ public final class GameDraw {
     }
 
     // draw entities
-    public static void drawEntity(GameEntity entity, ShapeRenderer shapeRenderer) {
+    public void drawEntity(GameEntity entity, ShapeRenderer shapeRenderer) {
 
 
         float x = entity.getX();
         float y = GameUtils.topY(entity.getY());
         float size = entity.getSize();
-        Color color = entity.getColor();
-        Color darker = GameUtils.darker(entity.getColor());
+        Color lighter = GameUtils.brightnessShift(entity.getColor(), 100);
+        Color color = (entity.isInjured()) ? lighter : entity.getColor();
+        Color darker = GameUtils.darker(color);
 
         if (entity.CanRender()) {
 
@@ -97,7 +101,7 @@ public final class GameDraw {
         }
     }
 
-    public static void drawHealth(GameEntity entity, ShapeRenderer shapeRenderer) {
+    public void drawHealth(GameEntity entity, ShapeRenderer shapeRenderer) {
         float outer = 2;
         float barHeight =3;
         float offsetY = entity.getSize() + barHeight + 8;
@@ -145,7 +149,7 @@ public final class GameDraw {
         shapeRenderer.end();
     }
 
-    public static void drawGrid(float gridSize , ShapeRenderer shapeRenderer) {
+    public void drawGrid(float gridSize , ShapeRenderer shapeRenderer) {
         float x = 0;
         float y = 0;
         float width = 1;

@@ -14,34 +14,30 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 public class Javarras extends ApplicationAdapter {
     ShapeRenderer shapeRenderer;
     GameEntity player;
+    GDShapeRenderer gameRenderer = new GDShapeRenderer();
 
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
 
-        float x = GameConfig.SPAWN_POINT[0];
-        float y = GameConfig.SPAWN_POINT[1];
-        float size = 20;
-        int health = 100;
+        Gun basicGun = new Gun(player,null, 18, 8, 1, 0, 0, 90);
 
-        Gun basicGun = new Gun(null, 18, 8, 1, 0, 0, 90);
+        player = new GameEntity(GameColors.blue, GameConfig.SPAWN_POINT[0], GameConfig.SPAWN_POINT[1], 20, 100,0);
 
         Gun[] boosterGuns = {
-                new Gun(null, 18, 8, 1, 0, 0, 0),
-                new Gun(null, 14, 8, 1, 0, -1, 140),
-                new Gun(null, 14, 8, 1, 0, 1, -140),
-                new Gun(null, 16, 8, 1, 0, 0, 150),
-                new Gun(null, 16, 8, 1, 0, 0, -150)
+            new Gun(player, null, 18, 8, 1, 0, 0, 0),
+            new Gun(player,null, 14, 8, 1, 0, -1, 140),
+            new Gun(player,null, 14, 8, 1, 0, 1, -140),
+            new Gun(player,null, 16, 8, 1, 0, 0, 150),
+            new Gun(player,null, 16, 8, 1, 0, 0, -150)
         };
-
-        player = new GameEntity(GameColors.blue, x, y, size, health);
 
         for (int i = 0; i < 5; i++) {
             player.addGun(boosterGuns[i]);
         }
 
         GameGlobals.entities.add(player);
-        GameEntity testEntity = new GameEntity(GameColors.pink, x + 200, y + 200, size, health);
+        GameEntity testEntity = new GameEntity(GameColors.pink, GameConfig.SPAWN_POINT[0] + 200, GameConfig.SPAWN_POINT[1] + 200, 20, 100,69);
         GameGlobals.entities.add(testEntity);
 
     }
@@ -49,14 +45,14 @@ public class Javarras extends ApplicationAdapter {
     @Override
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
-
+        //System.out.println(player.vx);
         ScreenUtils.clear(GameColors.bg);
-        GameDraw.drawGrid(20, shapeRenderer);
+        gameRenderer.drawGrid(20, shapeRenderer);
         if (GameGlobals.entities != null && !GameGlobals.entities.isEmpty()) {
             // draw entities
             for (GameEntity entity : new ArrayList<>(GameGlobals.entities)) {
                 if (entity.isAlive()) {
-                    GameDraw.drawEntity(entity, shapeRenderer);
+                    gameRenderer.drawEntity(entity, shapeRenderer);
                 }
 
                 entity.step(delta);
@@ -64,7 +60,7 @@ public class Javarras extends ApplicationAdapter {
             // draw hp bars above all entities
             for (GameEntity entity : new ArrayList<>(GameGlobals.entities)) {
                 if (entity.isAlive()) {
-                    GameDraw.drawHealth(entity, shapeRenderer);
+                    gameRenderer.drawHealth(entity, shapeRenderer);
                 }
 
                 entity.step(delta);

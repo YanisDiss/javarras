@@ -8,6 +8,7 @@ public final class GameConfig {
     // window stuff
     final public static short WINDOW_WIDTH = 1280;
     final public static short WINDOW_HEIGHT = 720;
+    final public static short FRAMES_PER_SECOND = 60;
     final public static boolean RESIZABLE_WINDOW = false;
     public static boolean LOW_GRAPHICS = false;
 
