@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 public class Javarras extends ApplicationAdapter {
     ShapeRenderer shapeRenderer;
     GameEntity player;
+    GameEntity testEntity;
     GDShapeRenderer gameRenderer = new GDShapeRenderer();
 
     @Override
@@ -37,7 +38,7 @@ public class Javarras extends ApplicationAdapter {
         }
 
         GameGlobals.entities.add(player);
-        GameEntity testEntity = new GameEntity(GameColors.pink, GameConfig.SPAWN_POINT[0] + 200, GameConfig.SPAWN_POINT[1] + 200, 20, 100,69);
+        testEntity = new GameEntity(GameColors.pink, GameConfig.SPAWN_POINT[0] + 200, GameConfig.SPAWN_POINT[1] + 200, 20, 100,69);
         GameGlobals.entities.add(testEntity);
 
     }
@@ -45,9 +46,9 @@ public class Javarras extends ApplicationAdapter {
     @Override
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
-        //System.out.println(player.vx);
-        ScreenUtils.clear(GameColors.bg);
-        gameRenderer.drawGrid(20, shapeRenderer);
+        //GameConfig.DEFAULT_FOV += 0.0005f;
+        ScreenUtils.clear(GameColors.outerbg);
+        gameRenderer.drawArena(shapeRenderer);
         if (GameGlobals.entities != null && !GameGlobals.entities.isEmpty()) {
             // draw entities
             for (GameEntity entity : new ArrayList<>(GameGlobals.entities)) {
@@ -59,7 +60,7 @@ public class Javarras extends ApplicationAdapter {
             }
             // draw hp bars above all entities
             for (GameEntity entity : new ArrayList<>(GameGlobals.entities)) {
-                if (entity.isAlive()) {
+                if (entity.isAlive() && entity.getHealth() < entity.getMaxHealth() ) {
                     gameRenderer.drawHealth(entity, shapeRenderer);
                 }
 

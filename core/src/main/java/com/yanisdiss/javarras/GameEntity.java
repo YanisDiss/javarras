@@ -17,6 +17,7 @@ public class GameEntity {
     private float vx,vy;
     private float ax,ay;
     private float speed = 1;
+    private float regen = 2;
     private Color color;
     private float health, maxHealth;
     private float angle;
@@ -26,6 +27,7 @@ public class GameEntity {
     private int team;
     private float bodyDamage;
     private float density;
+    private boolean canGoOutsideRoom;
     private GameEntity master;
     private final int id;
     private List<Gun> guns = new ArrayList<>();
@@ -46,6 +48,7 @@ public class GameEntity {
         this.id = entityId;
         this.bodyDamage = 0.1f;
         this.density = 1;
+        this.canGoOutsideRoom = false;
         this.injured = false;
 
         incrementId();
@@ -82,9 +85,8 @@ public class GameEntity {
 
         if (this.isAlive){
             if (this.id == playerId) {
-                int mouseX = GameUtils.getMouseX();
-                int mouseY = GameUtils.getMouseY();
-                this.angle = (float) Math.atan2(mouseY - this.y, mouseX - this.x);
+                float[] mousePos = GameUtils.getWorldMouse();
+                this.angle = (float) Math.atan2(mousePos[1] - this.y, mousePos[0] - this.x);
                 GameConfig.CAMERA_X = this.x;
                 GameConfig.CAMERA_Y = this.y;
                 handleInput(delta);
@@ -114,13 +116,31 @@ public class GameEntity {
                 }
             }
 
+            if (!this.canGoOutsideRoom){
+                // arena boundaries
+                if (this.x > GameConfig.ARENA_DIMENSIONS[0]) {
+                    this.vx -= (this.x - GameConfig.ARENA_DIMENSIONS[0]) * GameConfig.ARENA_BOUND_FORCE * delta;
+                }
+                if (this.x < 0) {
+                    this.vx -= this.x * GameConfig.ARENA_BOUND_FORCE * delta;
+                }
+                if (this.y > GameConfig.ARENA_DIMENSIONS[1]) {
+                    this.vy -= (this.y - GameConfig.ARENA_DIMENSIONS[1]) * GameConfig.ARENA_BOUND_FORCE * delta;
+                }
+                if (this.y < 0) {
+                    this.vy -= this.y * GameConfig.ARENA_BOUND_FORCE * delta;
+                }
+            }
+            // regen
+            this.changeHealth(this.regen * delta);
+
+            // damage anim (flicker will be gameDrawer-sided)
             if (this.injured) {
                 this.injured = false;
             }
-
         } else
         {
-            // todo: death animation will be client-sided (gameDrawer) do not add it here
+            // death animation will be client-sided (gameDrawer) do not add it here
             GameGlobals.entities.remove(this);
         }
 
@@ -223,7 +243,7 @@ public class GameEntity {
         isAlive = alive;
     }
 
-    public boolean CanRender() {
+    public boolean canRender() {
         return canRender;
     }
 
