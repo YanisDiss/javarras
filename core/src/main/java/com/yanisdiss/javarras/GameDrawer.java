@@ -8,4 +8,5 @@ public interface GameDrawer {
     void drawEntity(GameEntity entity, ShapeRenderer shapeRenderer);
     void drawHealth(GameEntity entity, ShapeRenderer shapeRenderer);
     void drawGrid(float gridSize, ShapeRenderer shapeRenderer);
+    void drawArena(ShapeRenderer shapeRenderer);
 }

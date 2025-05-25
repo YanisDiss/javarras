@@ -32,6 +32,7 @@ public class GameEntity {
     private final int id;
     private List<Gun> guns = new ArrayList<>();
     private boolean injured;
+    private boolean controllable;
 
     public GameEntity(Color color, float x, float y, float size, float health, int team) {
         this.color = (color != null) ? color : GameColors.grey;
@@ -43,6 +44,7 @@ public class GameEntity {
         this.isAlive = true;
         this.canRender = true;
         this.canCollide = true;
+        this.controllable = false;
         this.team = team;
         this.master = this;
         this.id = entityId;
@@ -54,22 +56,7 @@ public class GameEntity {
         incrementId();
     }
 
-    public void handleInput(float delta) {
-        // Direct velocity control
-        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.DPAD_LEFT)) {
-            this.move(delta,"left");
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.DPAD_RIGHT)) {
-            this.move(delta,"right");
-        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
-            this.move(delta,"up");
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
-            this.move(delta,"down");
-        }
-    }
 
     public void collide(GameEntity other) {
         float selfAngle = (float)Math.atan2(this.y - other.y, this.x - other.x);
@@ -81,17 +68,58 @@ public class GameEntity {
         other.vy += Math.sin(otherAngle) * other.density;
     }
 
+    public void checkRoomBoundaries(float delta) {
+        if (!this.canGoOutsideRoom){
+            // arena boundaries
+            if (this.x > GameConfig.ARENA_DIMENSIONS[0]) {
+                this.vx -= (this.x - GameConfig.ARENA_DIMENSIONS[0]) * GameConfig.ARENA_BOUND_FORCE * delta;
+            }
+            if (this.x < 0) {
+                this.vx -= this.x * GameConfig.ARENA_BOUND_FORCE * delta;
+            }
+            if (this.y > GameConfig.ARENA_DIMENSIONS[1]) {
+                this.vy -= (this.y - GameConfig.ARENA_DIMENSIONS[1]) * GameConfig.ARENA_BOUND_FORCE * delta;
+            }
+            if (this.y < 0) {
+                this.vy -= this.y * GameConfig.ARENA_BOUND_FORCE * delta;
+            }
+        }
+    }
+
+    public void move(float delta ,String way){
+        switch(way) {
+            case "left":
+                this.vx -= 1000 * this.speed * delta;
+                break;
+            case "right":
+                this.vx += 1000 * this.speed  * delta;
+                break;
+            case "up":
+                this.vy -= 1000 * this.speed * delta;
+                break;
+            case "down":
+                this.vy += 1000 * this.speed * delta;
+                break;
+            default:
+                break;
+            // todo: normalize speed when pressing 2 keys at once
+        }
+    }
+
     public void step(float delta) {
 
         if (this.isAlive){
+            float[] mousePos = GameUtils.getWorldMouse();
             if (this.id == playerId) {
-                float[] mousePos = GameUtils.getWorldMouse();
-                this.angle = (float) Math.atan2(mousePos[1] - this.y, mousePos[0] - this.x);
                 GameConfig.CAMERA_X = this.x;
                 GameConfig.CAMERA_Y = this.y;
-                handleInput(delta);
-
+                this.controllable = true;
             }
+            if (this.master.controllable) {
+                this.angle = (float) Math.atan2(mousePos[1] - this.master.y, mousePos[0] - this.master.x);
+                InputManager.handleMoveInput(this, delta);
+            }
+
             this.vx += this.ax * delta;
             this.vy += this.ay * delta;
 
@@ -116,24 +144,10 @@ public class GameEntity {
                 }
             }
 
-            if (!this.canGoOutsideRoom){
-                // arena boundaries
-                if (this.x > GameConfig.ARENA_DIMENSIONS[0]) {
-                    this.vx -= (this.x - GameConfig.ARENA_DIMENSIONS[0]) * GameConfig.ARENA_BOUND_FORCE * delta;
-                }
-                if (this.x < 0) {
-                    this.vx -= this.x * GameConfig.ARENA_BOUND_FORCE * delta;
-                }
-                if (this.y > GameConfig.ARENA_DIMENSIONS[1]) {
-                    this.vy -= (this.y - GameConfig.ARENA_DIMENSIONS[1]) * GameConfig.ARENA_BOUND_FORCE * delta;
-                }
-                if (this.y < 0) {
-                    this.vy -= this.y * GameConfig.ARENA_BOUND_FORCE * delta;
-                }
-            }
+            // room boundaries
+            this.checkRoomBoundaries(delta);
             // regen
             this.changeHealth(this.regen * delta);
-
             // damage anim (flicker will be gameDrawer-sided)
             if (this.injured) {
                 this.injured = false;
@@ -144,26 +158,6 @@ public class GameEntity {
             GameGlobals.entities.remove(this);
         }
 
-    }
-
-    public void move(float delta ,String way){
-        switch(way) {
-            case "left":
-                this.vx -= 1000 * this.speed * delta;
-                break;
-            case "right":
-                this.vx += 1000 * this.speed  * delta;
-                break;
-            case "up":
-                this.vy -= 1000 * this.speed * delta;
-                break;
-            case "down":
-                this.vy += 1000 * this.speed * delta;
-                break;
-            default:
-                break;
-                // todo: normalize speed when pressing 2 keys at once
-        }
     }
 
     public void kill() {
@@ -177,6 +171,14 @@ public class GameEntity {
         if (hlt < 0) {
             this.injured = true;
         }
+    }
+
+    public boolean isControllable() {
+        return controllable;
+    }
+
+    public void setControllable(boolean controllable) {
+        this.controllable = controllable;
     }
 
     public void setMaxHealth(float maxHealth) {
@@ -289,5 +291,13 @@ public class GameEntity {
 
     public void setMaster(GameEntity master) {
         this.master = master;
+    }
+
+    public static int getPlayerId() {
+        return playerId;
+    }
+
+    public static void setPlayerId(int playerId) {
+        GameEntity.playerId = playerId;
     }
 }

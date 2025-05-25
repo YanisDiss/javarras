@@ -31,9 +31,14 @@ public final class GameUtils {
 
 
     public static float[] getWorldMouse() {
-        float x = (Gdx.input.getX() - GameConfig.WINDOW_WIDTH / 2f) * GameConfig.DEFAULT_FOV + GameConfig.CAMERA_X;
-        float y = (Gdx.input.getY() - GameConfig.WINDOW_HEIGHT / 2f) * GameConfig.DEFAULT_FOV + GameConfig.CAMERA_Y;
+        float x = (Gdx.input.getX() - GameConfig.WINDOW_WIDTH / 2f) * GameConfig.CLIENT_FOV + GameConfig.CAMERA_X;
+        float y = (Gdx.input.getY() - GameConfig.WINDOW_HEIGHT / 2f) * GameConfig.CLIENT_FOV + GameConfig.CAMERA_Y;
         return new float[]{x, y};
+    }
+
+    public static boolean isTargeted(GameEntity entity, float[] mouse) {
+        float diff = (float)Math.hypot(entity.getX() - mouse[0], entity.getY() - mouse[1]);
+        return diff < entity.getSize();
     }
 
     public static float topY(float y) {

@@ -12,16 +12,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  * platforms.
  */
 public class Javarras extends ApplicationAdapter {
-    ShapeRenderer shapeRenderer;
-    GameEntity player;
-    GameEntity testEntity;
-    GDShapeRenderer gameRenderer = new GDShapeRenderer();
+    private ShapeRenderer shapeRenderer;
+    private GameEntity player;
+    private final GameDrawer gameRenderer = new GDShapeRenderer();
 
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
 
-        Gun basicGun = new Gun(player,null, 18, 8, 1, 0, 0, 90);
+        Gun basicGun = new Gun(player,null, 14, 10, 1f, 0, 0, 0);
 
         player = new GameEntity(GameColors.blue, GameConfig.SPAWN_POINT[0], GameConfig.SPAWN_POINT[1], 20, 100,0);
 
@@ -38,7 +37,8 @@ public class Javarras extends ApplicationAdapter {
         }
 
         GameGlobals.entities.add(player);
-        testEntity = new GameEntity(GameColors.pink, GameConfig.SPAWN_POINT[0] + 200, GameConfig.SPAWN_POINT[1] + 200, 20, 100,69);
+        GameEntity testEntity = new GameEntity(GameColors.pink, GameConfig.SPAWN_POINT[0] + 200, GameConfig.SPAWN_POINT[1] + 200, 20, 100, 69);
+        testEntity.addGun(basicGun);
         GameGlobals.entities.add(testEntity);
 
     }
@@ -46,16 +46,17 @@ public class Javarras extends ApplicationAdapter {
     @Override
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
-        //GameConfig.DEFAULT_FOV += 0.0005f;
         ScreenUtils.clear(GameColors.outerbg);
         gameRenderer.drawArena(shapeRenderer);
+        InputManager.handleKeyCommands(null);
         if (GameGlobals.entities != null && !GameGlobals.entities.isEmpty()) {
-            // draw entities
             for (GameEntity entity : new ArrayList<>(GameGlobals.entities)) {
+                // handle inputs for each entity
+                InputManager.handleKeyCommands(entity);
+                // draw entities
                 if (entity.isAlive()) {
                     gameRenderer.drawEntity(entity, shapeRenderer);
                 }
-
                 entity.step(delta);
             }
             // draw hp bars above all entities
